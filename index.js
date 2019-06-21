@@ -11,6 +11,8 @@ const Readline = require('@serialport/parser-readline');
 var port = new SerialPort('/dev/ttyUSB0');
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
+const fs = require('fs');
+const filename =  new Date().toISOString();
 
 app.use(express.static('public'));
 
@@ -22,6 +24,8 @@ http.listen(3000, function()
 
 
 parser.on('data', function(data){
-	io.emit('data', data);
+  io.emit('data', data);
+
+  fs.appendFile("log/"+filename+".txt", data+"\n", function(err){}); 
 });
 

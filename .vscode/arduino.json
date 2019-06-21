@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:nano",
+    "configuration": "cpu=atmega328old",
+    "sketch": "lidar_scanner/lidar_scanner.ino",
+    "port": "/dev/ttyUSB0"
+}
