@@ -9,14 +9,14 @@
 	https://github.com/mrdoob/three.js/blob/master/examples/webgl_buffergeometry.html
 */
 
-
+var scene;
 
 $(document).ready(function()
 {
 
 	//-- scene
 
-	var scene = new THREE.Scene();
+	scene = new THREE.Scene();
 	//scene.background = new THREE.Color( 0xf0f0f0 );
 	var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.001, 1000 );
 	camera.position.set(0,0,-50);	
@@ -37,6 +37,17 @@ $(document).ready(function()
 
 
 
+	//-- light
+
+	scene.add(new THREE.AmbientLight(0x444444));
+	var light1 = new THREE.DirectionalLight(0xffffff, 0.5);
+	light1.position.set(50, 50, 50);
+	scene.add(light1);
+	var light2 = new THREE.DirectionalLight(0xffffff, 1.5);
+	light2.position.set(0, -50, 0);
+	scene.add(light2);
+
+
 	//-- axes
 
 	var axesHelper = new THREE.AxesHelper( 5 );
@@ -45,17 +56,8 @@ $(document).ready(function()
 
 	//-- figure
 
-	var geom = new THREE.Geometry();
-	geom.dynamic = true;
-	//var mat = new THREE.MeshNormalMaterial();
-	var mat = new THREE.MeshBasicMaterial({color:0x00ff00,wireframe:false});
-	var figure = new THREE.Mesh( geom, mat );
-	scene.add(figure);
-
-	for(var i=0 ; i<10000 ; i++)
-	{
-		geom.faces.push(new THREE.Face3(0,0,0));
-	}
+	var figure = new Figure();
+	scene.add( figure.object );
 
 
 	//-- animate
@@ -63,13 +65,16 @@ $(document).ready(function()
 	function animate()
 	{
         //figure.geometry.normalize();
-		geom.verticesNeedUpdate = true;
-		geom.elementsNeedUpdate = true;
-		geom.computeBoundingSphere();
+		//geom.verticesNeedUpdate = true;
+		//geom.elementsNeedUpdate = true;
+		//geom.computeBoundingSphere();
+
+//		figure.object.geometry.attributes.position.needsUpdate = true;
 
 		requestAnimationFrame( animate );
 		controls.update();
 		renderer.render( scene, camera );
+
 	}
 	animate();
 
@@ -82,35 +87,9 @@ $(document).ready(function()
 	socket.on('data', function(d)
 	{
 		var [distance, x, y] = d.split("\t");
-		console.log(distance + ' - ' + x + ' - ' + y);
-		add_point_spherical_2(distance, x, y);
+	//	console.log(distance + ' - ' + x + ' - ' + y);
+		figure.add(distance, x, y);
 	});
-
-var n=0;
-
-	function add_point_spherical_2(distance, x, y)
-	{
-n+=2;
-		var ppr=134;
-		var v = new THREE.Vector3();
-		v.setFromSphericalCoords(distance/100, THREE.Math.degToRad(y), THREE.Math.degToRad(x) );
-		geom.vertices.push(v);
-
-		var n = geom.vertices.length-1;
-		if(n>ppr)
-		{
-			//geom.faces.push(new THREE.Face3(n,n-ppr,n-ppr-1));
-			//geom.faces.push(new THREE.Face3(n,n-1,n-ppr-1));
-			geom.faces[n] = new THREE.Face3(n,n-ppr,n-ppr-1);
-			geom.faces[n-1] = new THREE.Face3(n,n-1,n-ppr-1);
-			geom.computeFaceNormals();
-/*
-			add_point_cartesian(geom.vertices[n].x, geom.vertices[n].y, geom.vertices[n].z);
-			add_point_cartesian(geom.vertices[n-ppr].x, geom.vertices[n-ppr].y, geom.vertices[n-ppr].z);
-			add_point_cartesian(geom.vertices[n-ppr-1].x, geom.vertices[n-ppr-1].y, geom.vertices[n-ppr-1].z);
-*/
-		}
-	}
 
 
 	function add_point_spherical(distance, x, y)
