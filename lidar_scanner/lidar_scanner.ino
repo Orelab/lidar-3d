@@ -18,7 +18,7 @@ Servo y_servo;
 
 int h_stp=15;            // horizontal step
 int v_stp=5;            // vertical step
-int del=50;             // delay
+int del=80;             // delay
 int min_range=500;       // a range from 500 to 2500 corresponds to a range from 0 to 180 degrees
 int max_range=2500;
 
@@ -92,7 +92,7 @@ void play(int x, int y)
   Serial.print("\t");
   Serial.print( mapFloat(x,min_range,max_range,0,180) );
   Serial.print("\t");
-  Serial.print( mapFloat(y,min_range,max_range,0,180)-35 );
+  Serial.print( mapFloat(y,min_range,max_range,0,180)-45 );
   Serial.println();
   /*
 
