@@ -14,6 +14,21 @@
 	https://stackoverflow.com/questions/20303239/three-js-how-to-update-buffergeometry-vertices
 */
 
+
+function generate_interface(){
+	$('body').append('<ul id="files"/>');
+
+	$.ajax('/files').done((data)=>{
+		data.forEach((e)=>{
+			$(`<li>${e.file} - ${e.size}</li>`)
+			.attr('file', e.file)
+			.attr('size', e.size)
+			.appendTo('#files');
+		});
+	});
+}
+
+
 var scene, figure;
 
 $(document).ready(function()
@@ -23,14 +38,14 @@ $(document).ready(function()
 	//-- scene
 
 	scene = new THREE.Scene();
-	scene.background = new THREE.Color(0xf0f0f0);
+	scene.background = new THREE.Color('black');
 	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
-	camera.position.set(0,0,-50);	
-	camera.lookAt(0,-50,0);	
+	camera.position.set(0,0,-5);	
+	camera.lookAt(0,0,0);	
 
 	var renderer = new THREE.WebGLRenderer({alpha:true});
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.physicallyCorrectLights = true;
+	//renderer.physicallyCorrectLights = true;
 	renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.BasicShadowMap;
 	document.body.appendChild( renderer.domElement );
@@ -48,11 +63,15 @@ $(document).ready(function()
 
 	//-- light
 
-	var ambiantLight = new THREE.AmbientLight(0xffffff, 1);
+	var ambiantLight = new THREE.AmbientLight(0xffffff, .5);
 	scene.add(ambiantLight);
 	
-	var pointLight = new THREE.PointLight(0xffffff, 3);
+	var pointLight = new THREE.PointLight(0xffffff, .5);
 	scene.add(pointLight);
+	
+	var pointLight2 = new THREE.PointLight(0xffffff, .5);
+	pointLight2.position.set(0,-2,0);
+	scene.add(pointLight2);
 
 	
 	//-- axes
@@ -71,17 +90,9 @@ $(document).ready(function()
 
 	function animate()
 	{
-        //figure.geometry.normalize();
-		//geom.verticesNeedUpdate = true;this.object
-		//geom.elementsNeedUpdate = true;
-		//geom.computeBoundingSphere();
-
-//		figure.object.geometry.attributes.position.needsUpdate = true;
-
 		requestAnimationFrame( animate );
 		controls.update();
 		renderer.render( scene, camera );
-
 	}
 	animate();
 
@@ -93,28 +104,6 @@ $(document).ready(function()
 	socket.on('data', data_load);
 
 
-	function add_point_spherical(distance, x, y)
-	{
-		var geometry = new THREE.SphereGeometry(.005);
-		var material = new THREE.MeshBasicMaterial({color:0xffff00});
-		var sphere = new THREE.Mesh(geometry, material);
-		sphere.position.set(0,0,50);
-		sphere.position.setFromSphericalCoords(distance/100, THREE.Math.degToRad(y), THREE.Math.degToRad(x) );
-		scene.add(sphere);
-	}
-
-
-
-	function add_point_cartesian(x, y, z)
-	{
-		var geometry = new THREE.SphereGeometry(.005);
-		var material = new THREE.MeshBasicMaterial({color:0xffff00});
-		var sphere = new THREE.Mesh(geometry, material);
-		sphere.position.set(z,x,y);
-		scene.add(sphere);
-	}
-
-
 
 	function data_load(d){
 		var [distance, x, y] = d.split("\t");
@@ -122,22 +111,10 @@ $(document).ready(function()
 		figure.add(distance, x, y);
 		//add_point_spherical(distance, x, y);
 	}
-	
-	
-	function generate_interface(){
-		$('body').append('<ul id="files"/>');
-	
-		$.ajax('/files').done((data)=>{
-			data.forEach((e)=>{
-				$(`<li>${e.file} - ${e.size}</li>`)
-				.attr('file', e.file)
-				.attr('size', e.size)
-				.appendTo('#files');
-			});
-		});
-	}
-	
-	
+
+
+	//-- object loading by clicking
+
 	$('body').delegate('li', 'click', function(){
 		var filename = $(this).attr('file');
 
@@ -154,6 +131,20 @@ $(document).ready(function()
 			}
 		});
 	});
+
+	function add_point_spherical(distance, x, y)
+	{
+		var geometry = new THREE.SphereGeometry(.005);
+		var material = new THREE.MeshBasicMaterial({color:0xffff00});
+		var sphere = new THREE.Mesh(geometry, material);
+		sphere.position.set(0,0,50);
+		sphere.position.setFromSphericalCoords(distance/100, THREE.Math.degToRad(y), THREE.Math.degToRad(x) );
+		scene.add(sphere);
+	}
+
+
+	
+
 });
 
 

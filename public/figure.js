@@ -28,6 +28,7 @@ class Figure {
         this.geom.addAttribute( 'normal', new THREE.Float32BufferAttribute(this.normals, 3).onUpload(disposeArray));
         this.geom.addAttribute( 'color', new THREE.Float32BufferAttribute( this.colors, 3 ).onUpload( disposeArray ) );
         this.geom.computeBoundingSphere();
+        this.geom.computeFaceNormals();
     
         //this.mat = new THREE.MeshNormalMaterial();
         //this.mat = new THREE.MeshBasicMaterial({color:0x00ff00,wireframe:false});
@@ -42,7 +43,7 @@ class Figure {
 
     add(distance, x, y)
     {
-        if( distance == 0 || distance > 8000 ) // 8190 == out of range for V53L0X
+        if( distance <= 10 || distance > 8000 ) // 8190 == out of range for V53L0X
         {
             return;
         }
@@ -171,10 +172,6 @@ class Figure {
     {
         // If one point is missing, no face !
 
-        if( points === 'undefined' || points == null ){
-            return;
-        }
-
         if( typeof points !== 'object'){
             return;
         }
@@ -189,8 +186,6 @@ class Figure {
         {
             return;
         }
-        //console.log( "adding point");
-        //console.log(points);
 
         // triangle geometry
         var geom = new THREE.Geometry();
@@ -201,13 +196,19 @@ class Figure {
         geom.computeFaceNormals();
 
         // material
-        //var mat = new THREE.MeshLambertMaterial({color: 0xFF0000, side:THREE.DoubleSide});
-        //var mat = new THREE.MeshBasicMaterial({color:0xFF0000, side:THREE.DoubleSide, wireframe:true});
-        //var mat = new THREE.MeshPhongMaterial({color:0xFF0000, specular:0x555555, shininess:30});
-        var mat = new THREE.MeshPhongMaterial({color:0xFF0000, side:THREE.DoubleSide, transparent:true, opacity:0.9, wireframe:false});
+        var mat = new THREE.MeshPhongMaterial({
+            color: 0xFF0000, 
+            side: THREE.DoubleSide, 
+            specular: 0x555555, 
+            shininess: 30, 
+            transparent: true, 
+            opacity: 0.9, 
+            wireframe: false
+        });
 
-        //  form mesh of geometry + material and add it to the scene
         var mesh = new THREE.Mesh(geom, mat);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         this.object.add(mesh);
     }
 
