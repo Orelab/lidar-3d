@@ -198,12 +198,13 @@ class Figure {
         geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y, points[1].coords.z));
         geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y, points[2].coords.z));
         geom.faces.push(new THREE.Face3(0, 1, 2));
+        geom.computeFaceNormals();
+
         // material
         //var mat = new THREE.MeshLambertMaterial({color: 0xFF0000, side:THREE.DoubleSide});
-        //var mat = new THREE.MeshBasicMaterial({color:0xFF0000, side:THREE.DoubleSide});
-        //var mat = new THREE.MeshPhongMaterial({ ambient: 0x050505, color: 0x0033ff, specular: 0x555555, shininess: 30 });
-        var mat = new THREE.MeshPhongMaterial({color: 0x0033ff, side:THREE.DoubleSide});
-        //var mat = new THREE.MeshPhongMaterial(); mat.color.setHSL(3, 1, .75);
+        //var mat = new THREE.MeshBasicMaterial({color:0xFF0000, side:THREE.DoubleSide, wireframe:true});
+        //var mat = new THREE.MeshPhongMaterial({color:0xFF0000, specular:0x555555, shininess:30});
+        var mat = new THREE.MeshPhongMaterial({color:0xFF0000, side:THREE.DoubleSide, transparent:true, opacity:0.9, wireframe:false});
 
         //  form mesh of geometry + material and add it to the scene
         var mesh = new THREE.Mesh(geom, mat);

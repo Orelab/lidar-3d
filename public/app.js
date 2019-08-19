@@ -47,30 +47,14 @@ $(document).ready(function()
 
 
 	//-- light
-/*
-	scene.add(new THREE.AmbientLight(0x444444));
-	var light1 = new THREE.DirectionalLight(0xffffff, 0.5);
-	light1.position.set(50, 50, 50);
-	scene.add(light1);
-	var light2 = new THREE.DirectionalLight(0xffffff, 1.5);
-	light2.position.set(0, -50, 0);
-*/
 
 	var ambiantLight = new THREE.AmbientLight(0xffffff, 1);
 	scene.add(ambiantLight);
 	
-	var pointLight = new THREE.PointLight(0xffffff, 1);
-/*
-	pointLight.castShadow = true;
-	pointLight.shadow.camera.near = 1;
-	pointLight.shadow.camera.far = 5000;
-*/
+	var pointLight = new THREE.PointLight(0xffffff, 3);
 	scene.add(pointLight);
-/*
-	var directionalLight = new THREE.DirectionalLight( 0xffffff );
-	directionalLight.position.set( 0, 0, -1 ).normalize();
-	scene.add(directionalLight);
-*/
+
+	
 	//-- axes
 
 	var axesHelper = new THREE.AxesHelper( 5 );
