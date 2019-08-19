@@ -7,23 +7,32 @@
 
 	https://threejs.org/examples/#webgl_buffergeometry
 	https://github.com/mrdoob/three.js/blob/master/examples/webgl_buffergeometry.html
+
+
+	https://stackoverflow.com/questions/42141438/access-to-faces-in-buffergeometry
+	http://www.oranlooney.com/post/deep-copy-javascript/
+	https://stackoverflow.com/questions/20303239/three-js-how-to-update-buffergeometry-vertices
 */
 
-var scene;
+var scene, figure;
 
 $(document).ready(function()
 {
+	generate_interface();
 
 	//-- scene
 
 	scene = new THREE.Scene();
-	//scene.background = new THREE.Color( 0xf0f0f0 );
-	var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.001, 1000 );
+	scene.background = new THREE.Color(0xf0f0f0);
+	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
 	camera.position.set(0,0,-50);	
 	camera.lookAt(0,-50,0);	
 
-	var renderer = new THREE.WebGLRenderer();
+	var renderer = new THREE.WebGLRenderer({alpha:true});
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.physicallyCorrectLights = true;
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = THREE.BasicShadowMap;
 	document.body.appendChild( renderer.domElement );
 
 	window.addEventListener( 'resize', function()
@@ -38,16 +47,30 @@ $(document).ready(function()
 
 
 	//-- light
-
+/*
 	scene.add(new THREE.AmbientLight(0x444444));
 	var light1 = new THREE.DirectionalLight(0xffffff, 0.5);
 	light1.position.set(50, 50, 50);
 	scene.add(light1);
 	var light2 = new THREE.DirectionalLight(0xffffff, 1.5);
 	light2.position.set(0, -50, 0);
-	scene.add(light2);
+*/
 
-
+	var ambiantLight = new THREE.AmbientLight(0xffffff, 1);
+	scene.add(ambiantLight);
+	
+	var pointLight = new THREE.PointLight(0xffffff, 1);
+/*
+	pointLight.castShadow = true;
+	pointLight.shadow.camera.near = 1;
+	pointLight.shadow.camera.far = 5000;
+*/
+	scene.add(pointLight);
+/*
+	var directionalLight = new THREE.DirectionalLight( 0xffffff );
+	directionalLight.position.set( 0, 0, -1 ).normalize();
+	scene.add(directionalLight);
+*/
 	//-- axes
 
 	var axesHelper = new THREE.AxesHelper( 5 );
@@ -56,7 +79,7 @@ $(document).ready(function()
 
 	//-- figure
 
-	var figure = new Figure();
+	figure = new Figure();
 	scene.add( figure.object );
 
 
@@ -65,7 +88,7 @@ $(document).ready(function()
 	function animate()
 	{
         //figure.geometry.normalize();
-		//geom.verticesNeedUpdate = true;
+		//geom.verticesNeedUpdate = true;this.object
 		//geom.elementsNeedUpdate = true;
 		//geom.computeBoundingSphere();
 
@@ -83,13 +106,7 @@ $(document).ready(function()
 	//-- interface update by Socket.io
 	
 	var socket = io();
-
-	socket.on('data', function(d)
-	{
-		var [distance, x, y] = d.split("\t");
-	//	console.log(distance + ' - ' + x + ' - ' + y);
-		figure.add(distance, x, y);
-	});
+	socket.on('data', data_load);
 
 
 	function add_point_spherical(distance, x, y)
@@ -113,5 +130,46 @@ $(document).ready(function()
 		scene.add(sphere);
 	}
 
+
+
+	function data_load(d){
+		var [distance, x, y] = d.split("\t");
+		//console.log(distance + ' - ' + x + ' - ' + y);
+		figure.add(distance, x, y);
+		//add_point_spherical(distance, x, y);
+	}
+	
+	
+	function generate_interface(){
+		$('body').append('<ul id="files"/>');
+	
+		$.ajax('/files').done((data)=>{
+			data.forEach((e)=>{
+				$(`<li>${e.file} - ${e.size}</li>`)
+				.attr('file', e.file)
+				.attr('size', e.size)
+				.appendTo('#files');
+			});
+		});
+	}
+	
+	
+	$('body').delegate('li', 'click', function(){
+		var filename = $(this).attr('file');
+
+		console.log('Generating ' + filename);
+
+		figure.clear();
+	
+		$.ajax('/file/'+filename).done(function(data){
+			var d = data.split("\n");
+
+			for(var i=0 ; i<d.length ; i++){
+				//console.log(d[i]);
+				data_load(d[i]);
+			}
+		});
+	});
 });
+
 

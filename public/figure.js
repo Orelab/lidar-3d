@@ -2,6 +2,8 @@
 class Figure {
 
     points = new List();
+    object;
+    
 
     positions = [];
     normals = [];
@@ -13,6 +15,8 @@ class Figure {
 
     constructor()
     {
+        this.clear();
+
         this.geom = new THREE.BufferGeometry();
         this.geom.dynamic = true;
 
@@ -30,7 +34,7 @@ class Figure {
         this.mat = new THREE.MeshPhongMaterial({color:0xd2baa8,side:THREE.DoubleSide});
     
         this.object = new THREE.Mesh( this.geom, this.mat );
-        this.object.geometry.attributes.position.needsUpdate = true;
+        //this.object.geometry.attributes.position.needsUpdate = true;
 
         window.addEventListener('click', function(){ this.click(); }.bind(this), false);
     }
@@ -38,6 +42,11 @@ class Figure {
 
     add(distance, x, y)
     {
+        if( distance == 0 || distance > 8000 ) // 8190 == out of range for V53L0X
+        {
+            return;
+        }
+
 		if( ! this.points.hasOwnProperty(y) )
 		{
 			this.points[y] = new List();
@@ -50,6 +59,23 @@ class Figure {
         var p = this.find_points(x, y);
         this.build_face2( p[0] );
         this.build_face2( p[1] );
+    }
+
+
+    /*
+        Call this method to clear the figure.
+        This will simply erase the figure from the scene and 
+        you'll be able to add new points to draw another figure.
+    */
+    clear()
+    {
+        //this.object.geometry.dispose();
+        //this.object.material.dispose();
+        scene.remove(this.object);
+        this.object = new THREE.Mesh();
+        scene.add(this.object);
+
+        this.points = new List();
     }
 
 
@@ -84,6 +110,8 @@ class Figure {
         {
             return;
         }
+        //console.log( "adding point");
+        //console.log(points);
 
         // update positions
 
@@ -143,14 +171,27 @@ class Figure {
     {
         // If one point is missing, no face !
 
+        if( points === 'undefined' || points == null ){
+            return;
+        }
+
+        if( typeof points !== 'object'){
+            return;
+        }
+        
+        if( points['length'] < 2 ){
+            return;
+        }
+
         if(    typeof points[0] === 'undefined'
             || typeof points[1] === 'undefined'
             || typeof points[2] === 'undefined' )
         {
             return;
         }
-        console.log( "adding point");
-        console.log(points);
+        //console.log( "adding point");
+        //console.log(points);
+
         // triangle geometry
         var geom = new THREE.Geometry();
         geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y, points[0].coords.z));
@@ -158,10 +199,15 @@ class Figure {
         geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y, points[2].coords.z));
         geom.faces.push(new THREE.Face3(0, 1, 2));
         // material
-        var mat = new THREE.MeshBasicMaterial({color: 0xFF0000, side: THREE.DoubleSide})
+        //var mat = new THREE.MeshLambertMaterial({color: 0xFF0000, side:THREE.DoubleSide});
+        //var mat = new THREE.MeshBasicMaterial({color:0xFF0000, side:THREE.DoubleSide});
+        //var mat = new THREE.MeshPhongMaterial({ ambient: 0x050505, color: 0x0033ff, specular: 0x555555, shininess: 30 });
+        var mat = new THREE.MeshPhongMaterial({color: 0x0033ff, side:THREE.DoubleSide});
+        //var mat = new THREE.MeshPhongMaterial(); mat.color.setHSL(3, 1, .75);
+
         //  form mesh of geometry + material and add it to the scene
         var mesh = new THREE.Mesh(geom, mat);
-        scene.add(mesh);
+        this.object.add(mesh);
     }
 
     toCartesian(distance, x, y)
