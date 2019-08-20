@@ -43,6 +43,9 @@ class Figure {
 
     add(distance, x, y)
     {
+//y = Math.round( y * 100 )/ 100;
+//console.log(y);
+
         if( distance <= 10 || distance > 8000 ) // 8190 == out of range for V53L0X
         {
             return;
@@ -58,6 +61,8 @@ class Figure {
         };
 
         var p = this.find_points(x, y);
+//console.log(p);
+
         this.build_face2( p[0] );
         this.build_face2( p[1] );
     }
@@ -105,7 +110,7 @@ class Figure {
         var face2 = [
             this.points[y][x],
             ( this.points.prev_val(y) || {} )[x],
-            ( this.points.prev_val(y) || new List() ).prev_val(x)
+            ( this.points.prev_val(y) || new List() ).next_val(x)
         ];
         
         return [face1, face2];
@@ -200,9 +205,10 @@ class Figure {
 
         // triangle geometry
         var geom = new THREE.Geometry();
-        geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y+2, points[0].coords.z));
-        geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y+2, points[1].coords.z));
-        geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y+2, points[2].coords.z));
+        var raise = 1;
+        geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y+raise, points[0].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y+raise, points[1].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y+raise, points[2].coords.z));
         geom.faces.push(new THREE.Face3(0, 1, 2));
         geom.mergeVertices();
         geom.computeVertexNormals();
