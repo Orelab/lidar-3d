@@ -83,6 +83,17 @@ class Figure {
     /*
         Each time a point is added, 
         potentially two triangles could be built
+
+           7--6--5
+          /| /| /|
+         / |/ |/ |
+        4--3--2--1
+
+        When 7 is added. Two triangles can be build :
+         -> 7-6-3
+         -> 7-3-4
+
+         In the following code, this.points[y][x] corresponds to 7
     */
     find_points(x, y)
     {
@@ -172,7 +183,7 @@ class Figure {
     {
         // If one point is missing, no face !
 
-        if( typeof points !== 'object'){
+        if( typeof points !== 'object' || points == null ){
             return;
         }
         
@@ -189,15 +200,18 @@ class Figure {
 
         // triangle geometry
         var geom = new THREE.Geometry();
-        geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y, points[0].coords.z));
-        geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y, points[1].coords.z));
-        geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y, points[2].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y+2, points[0].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y+2, points[1].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y+2, points[2].coords.z));
         geom.faces.push(new THREE.Face3(0, 1, 2));
+        geom.mergeVertices();
+        geom.computeVertexNormals();
+
         geom.computeFaceNormals();
 
         // material
         var mat = new THREE.MeshPhongMaterial({
-            color: 0xFF0000, 
+            color: 'grey', 
             side: THREE.DoubleSide, 
             specular: 0x555555, 
             shininess: 30, 
@@ -209,6 +223,7 @@ class Figure {
         var mesh = new THREE.Mesh(geom, mat);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+
         this.object.add(mesh);
     }
 

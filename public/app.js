@@ -40,11 +40,11 @@ $(document).ready(function()
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color('black');
 	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
-	camera.position.set(0,0,-5);	
+	camera.position.set(0,2,0);	
 	camera.lookAt(0,0,0);	
 
 	var renderer = new THREE.WebGLRenderer({alpha:true});
-	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setSize( window.innerWidth - 310, window.innerHeight );
 	//renderer.physicallyCorrectLights = true;
 	renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.BasicShadowMap;
@@ -54,7 +54,7 @@ $(document).ready(function()
 	{
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setSize( window.innerWidth - 310, window.innerHeight );
 	}, false );
 
 	var controls = new THREE.OrbitControls( camera, renderer.domElement );
