@@ -43,9 +43,6 @@ class Figure {
 
     add(distance, x, y)
     {
-//y = Math.round( y * 100 )/ 100;
-//console.log(y);
-
         if( distance <= 10 || distance > 8000 ) // 8190 == out of range for V53L0X
         {
             return;
@@ -61,8 +58,6 @@ class Figure {
         };
 
         var p = this.find_points(x, y);
-//console.log(p);
-
         this.build_face2( p[0] );
         this.build_face2( p[1] );
     }

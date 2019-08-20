@@ -68,7 +68,22 @@ $(document).ready(function()
 	
 	var pointLight = new THREE.PointLight(0xffffff, .5);
 	scene.add(pointLight);
+	pointLight.position.direction = true;
 	
+	function movePointLight(){
+		if( pointLight.position.direction )
+			pointLight.position.y+=.05;
+			else
+			pointLight.position.y-=.05;
+
+			if( pointLight.position.y < -1){
+			pointLight.position.direction = true;
+		}
+		if( pointLight.position.y > 1){
+			pointLight.position.direction = false;
+		}
+	}
+
 	var pointLight2 = new THREE.PointLight(0xffffff, .5);
 	pointLight2.position.set(0,-2,0);
 	scene.add(pointLight2);
@@ -93,6 +108,8 @@ $(document).ready(function()
 		requestAnimationFrame( animate );
 		controls.update();
 		renderer.render( scene, camera );
+
+		//movePointLight();
 	}
 	animate();
 
@@ -107,6 +124,7 @@ $(document).ready(function()
 
 	function data_load(d){
 		var [distance, x, y] = d.split("\t");
+		y = Math.ceil(y*1.05*100)/100 + "";	// => improper scanner calibration correction
 		//console.log(distance + ' - ' + x + ' - ' + y);
 		figure.add(distance, x, y);
 		//add_point_spherical(distance, x, y);
@@ -134,7 +152,7 @@ $(document).ready(function()
 
 	function add_point_spherical(distance, x, y)
 	{
-		var geometry = new THREE.SphereGeometry(.005);
+		var geometry = new THREE.SphereGeometry(.003);
 		var material = new THREE.MeshBasicMaterial({color:0xffff00});
 		var sphere = new THREE.Mesh(geometry, material);
 		sphere.position.set(0,0,50);
