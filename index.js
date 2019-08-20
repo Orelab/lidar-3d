@@ -1,3 +1,5 @@
+const USB_PORT = '/dev/ttyUSB0';
+
 
 const express = require('express');
 const app = express();
@@ -8,7 +10,7 @@ var io = require('socket.io')(http);
 
 var SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-var port = new SerialPort('/dev/ttyUSB0');
+var port = new SerialPort(USB_PORT);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 const path = require('path');
