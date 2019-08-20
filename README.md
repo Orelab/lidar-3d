@@ -6,7 +6,7 @@ Each recording is saved into a file which can be loaded later by clicking on it,
 
 Please note that this project is a work in progress, and a learning subject...
 
-![screenshot of the 3D render](https://github.com/Orelab/lidar-3d/blob/master/demo.jpg)
+![screenshot of the 3D render](https://github.com/Orelab/lidar-3d/blob/master/demo.png)
 
 ## Technologies
 
