@@ -15,18 +15,19 @@ canvas {
 }
 
 html canvas {
-	width: calc(100% - 320px);
+	width: calc(100% - 410px);
 }
 
 #panel {
 	position: fixed;
 	padding: 5px;
-	width: 300px;
+	width: 400px;
 	max-width: 50%;
 	top: 0px;
 	right: 0px;
 	bottom: 0px;
 	background-color: darkGrey;
+	font-size: .9em;
 	overflow-y: auto;
 	overflow-x: none;
 	cursor: pointer;
@@ -36,6 +37,45 @@ html canvas {
 	margin: 15px 15px 15px 0;
 }
 
-#files li:hover {
+#panel button {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	margin: 0 2px;
+	cursor: pointer;
+}
+
+button.point {
+	background-image: url(point.png);
+}
+
+button.plain {
+	background-image: url(plain.png);
+}
+
+button.wireframe {
+	background-image: url(wireframe.png);
+}
+
+button.delete {
+	background-image: url(delete.png);
+}
+
+#panel button:hover {
 	background-color: grey;
+}
+
+#panel button:last-of-type:hover {
+	font-weight: bold;
+	background-color: grey;
+}
+
+#panel li:hover {
+	background-color: grey;
+}
+
+#panel span {
+	color: #666;
+	font-style: italic;
+	font-size: .8em;
 }

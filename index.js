@@ -46,6 +46,12 @@ app.get('/file/:filename', function(req, res){
   });
 });
 
+app.get('/delete/:filename', function(req, res){
+  fs.rename('log/'+req.params.filename, 'trash/'+req.params.filename, function(err){
+    res.send(err ? 'ko' : 'ok');
+  });
+});
+
 http.listen(3000, function(){
   console.log('Listening orders on port 3000 !');
 });

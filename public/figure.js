@@ -116,12 +116,12 @@ class Figure {
         var face1 = [
             this.points[y][x],
             this.points[y].prev_val(x),
-            ( this.points.prev_val(y))[x]
+            ( this.points.prev_val(y) || {} )[x]
         ];
         var face2 = [
             this.points[y][x],
             this.points[y].prev_val(x),
-            ( this.points.prev_val(y)).next_val(x)
+            ( this.points.prev_val(y) || new List() ).next_val(x)
         ];
         
         return [face1, face2];

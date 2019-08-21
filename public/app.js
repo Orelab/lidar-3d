@@ -15,10 +15,28 @@
 */
 
 
+// https://blog.niap3d.com/fr/4,10,news-16-Convertir-des-octets-en-Javascript.html
+
+function FileConvertSize(aSize) {
+	aSize = Math.abs(parseInt(aSize, 10));
+	var def = [[1, 'octets'], [1024, 'ko'], [1024 * 1024, 'Mo'], [1024 * 1024 * 1024, 'Go'], [1024 * 1024 * 1024 * 1024, 'To']];
+	for (var i = 0; i < def.length; i++) {
+		if (aSize < def[i][0]) return (aSize / def[i - 1][0]).toFixed(2) + ' ' + def[i - 1][1];
+	}
+}
+
+
 function generate_interface() {
+	$('#files').empty();
 	$.ajax('/files').done((data) => {
 		data.forEach((e) => {
-			$(`<li>${e.file} - ${e.size}</li>`)
+			$(`<li>
+			<button class="point"></button><!--
+			--><button class="plain"></button><!--
+			--><button class="wireframe"></button><!--
+			--><button class="delete"></button>
+			${e.file} <span>${FileConvertSize(e.size)}</span>
+			</li>`)
 				.attr('file', e.file)
 				.attr('size', e.size)
 				.appendTo('#files');
@@ -27,7 +45,7 @@ function generate_interface() {
 }
 
 
-var scene, figure;
+var scene, figure, mode;	// mode = plain/wireframe/point
 
 $(document).ready(function () {
 	generate_interface();
@@ -41,7 +59,7 @@ $(document).ready(function () {
 	camera.lookAt(0, 0, 0);
 
 	var renderer = new THREE.WebGLRenderer({ alpha: true });
-	renderer.setSize(window.innerWidth - 310, window.innerHeight);
+	renderer.setSize(window.innerWidth - 410, window.innerHeight);
 	//renderer.physicallyCorrectLights = true;
 	renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.BasicShadowMap;
@@ -50,7 +68,7 @@ $(document).ready(function () {
 	window.addEventListener('resize', function () {
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
-		renderer.setSize(window.innerWidth - 310, window.innerHeight);
+		renderer.setSize(window.innerWidth - 410, window.innerHeight);
 	}, false);
 
 	var controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -122,7 +140,7 @@ $(document).ready(function () {
 		y = Math.ceil(y * 1.05 * 100) / 100 + "";	// => improper scanner calibration correction
 		//console.log(distance + ' - ' + x + ' - ' + y);
 
-		switch( $('input[name=model]:checked').val() ){
+		switch (mode) {
 			case "point":
 				figure.add_point(distance, x, y);
 				break;
@@ -139,8 +157,9 @@ $(document).ready(function () {
 
 	//-- object loading by clicking
 
-	$('body').delegate('li', 'click', function () {
-		var filename = $(this).attr('file');
+	$('#panel').delegate('.plain,.wireframe,.point', 'click', function () {
+		mode = this.className;
+		const filename = $(this).parent().attr('file');
 
 		console.log('Generating ' + filename);
 
@@ -152,6 +171,28 @@ $(document).ready(function () {
 			for (var i = 0; i < d.length; i++) {
 				//console.log(d[i]);
 				data_load(d[i]);
+			}
+		});
+	});
+
+	$('#panel').delegate('.delete', 'click', function () {
+
+		if( ! confirm('Are you sure you want to delete this file ? ' + "\n"
+			+ '(it will just  be moved in the trash/ folder)') ){
+			alert('Deletion canceled !');
+			return;
+		}
+
+		const filename = $(this).parent().attr('file');
+
+		console.log('Deleting ' + filename);
+
+		$.ajax('/delete/' + filename).done(function (data) {
+			if (data == 'ok') {
+				generate_interface();
+				alert('File deleted !');
+			} else {
+				alert('The file couldn\'t be deleted');
 			}
 		});
 	});
