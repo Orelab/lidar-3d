@@ -2,15 +2,15 @@
 class Figure {
 
     points = new List();
-    object;
     
-
     positions = [];
     normals = [];
     colors = [];
 
     geom = null;
     mat = null;
+    wireframe = true;
+    raise = 1;
     object = null;
 
     constructor()
@@ -63,6 +63,22 @@ class Figure {
     }
 
 
+
+    /*
+        This can be used in replacement of add()
+        to draw only a point instead of a complex mesh of vertex
+    */
+    add_point(distance, x, y)
+	{
+		var geometry = new THREE.SphereGeometry(.002);
+		var material = new THREE.MeshBasicMaterial({color:0xffff00});
+		var sphere = new THREE.Mesh(geometry, material);
+        sphere.position.setFromSphericalCoords(distance/100, THREE.Math.degToRad(y), THREE.Math.degToRad(x) );
+        sphere.position.y += this.raise;
+        this.object.add(sphere);
+	}
+
+
     /*
         Call this method to clear the figure.
         This will simply erase the figure from the scene and 
@@ -90,7 +106,7 @@ class Figure {
         4--3--2--1
 
         When 7 is added. Two triangles can be build :
-         -> 7-6-3
+         -> 7-3-6
          -> 7-3-4
 
          In the following code, this.points[y][x] corresponds to 7
@@ -100,12 +116,12 @@ class Figure {
         var face1 = [
             this.points[y][x],
             this.points[y].prev_val(x),
-            ( this.points.prev_val(y) || {} )[x]
+            ( this.points.prev_val(y))[x]
         ];
         var face2 = [
             this.points[y][x],
-            ( this.points.prev_val(y) || {} )[x],
-            ( this.points.prev_val(y) || new List() ).next_val(x)
+            this.points[y].prev_val(x),
+            ( this.points.prev_val(y)).next_val(x)
         ];
         
         return [face1, face2];
@@ -200,10 +216,9 @@ class Figure {
 
         // triangle geometry
         var geom = new THREE.Geometry();
-        var raise = 1;
-        geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y+raise, points[0].coords.z));
-        geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y+raise, points[1].coords.z));
-        geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y+raise, points[2].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[0].coords.x, points[0].coords.y+this.raise, points[0].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[1].coords.x, points[1].coords.y+this.raise, points[1].coords.z));
+        geom.vertices.push(new THREE.Vector3(points[2].coords.x, points[2].coords.y+this.raise, points[2].coords.z));
         geom.faces.push(new THREE.Face3(0, 1, 2));
         geom.mergeVertices();
         geom.computeVertexNormals();
@@ -218,7 +233,7 @@ class Figure {
             shininess: 30, 
             transparent: true, 
             opacity: 0.9, 
-            wireframe: false
+            wireframe: this.wireframe
         });
 
         var mesh = new THREE.Mesh(geom, mat);

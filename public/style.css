@@ -18,7 +18,7 @@ html canvas {
 	width: calc(100% - 320px);
 }
 
-#files {
+#panel {
 	position: fixed;
 	padding: 5px;
 	width: 300px;
@@ -30,6 +30,10 @@ html canvas {
 	overflow-y: auto;
 	overflow-x: none;
 	cursor: pointer;
+}
+
+#panel input {
+	margin: 15px 15px 15px 0;
 }
 
 #files li:hover {

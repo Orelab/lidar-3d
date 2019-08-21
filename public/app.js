@@ -15,15 +15,13 @@
 */
 
 
-function generate_interface(){
-	$('body').append('<ul id="files"/>');
-
-	$.ajax('/files').done((data)=>{
-		data.forEach((e)=>{
+function generate_interface() {
+	$.ajax('/files').done((data) => {
+		data.forEach((e) => {
 			$(`<li>${e.file} - ${e.size}</li>`)
-			.attr('file', e.file)
-			.attr('size', e.size)
-			.appendTo('#files');
+				.attr('file', e.file)
+				.attr('size', e.size)
+				.appendTo('#files');
 		});
 	});
 }
@@ -31,8 +29,7 @@ function generate_interface(){
 
 var scene, figure;
 
-$(document).ready(function()
-{
+$(document).ready(function () {
 	generate_interface();
 
 	//-- scene
@@ -40,24 +37,23 @@ $(document).ready(function()
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color('black');
 	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
-	camera.position.set(0,2,0);	
-	camera.lookAt(0,0,0);	
+	camera.position.set(0, 2, 0);
+	camera.lookAt(0, 0, 0);
 
-	var renderer = new THREE.WebGLRenderer({alpha:true});
-	renderer.setSize( window.innerWidth - 310, window.innerHeight );
+	var renderer = new THREE.WebGLRenderer({ alpha: true });
+	renderer.setSize(window.innerWidth - 310, window.innerHeight);
 	//renderer.physicallyCorrectLights = true;
 	renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.BasicShadowMap;
-	document.body.appendChild( renderer.domElement );
+	document.body.appendChild(renderer.domElement);
 
-	window.addEventListener( 'resize', function()
-	{
+	window.addEventListener('resize', function () {
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
-		renderer.setSize( window.innerWidth - 310, window.innerHeight );
-	}, false );
+		renderer.setSize(window.innerWidth - 310, window.innerHeight);
+	}, false);
 
-	var controls = new THREE.OrbitControls( camera, renderer.domElement );
+	var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 
 
@@ -65,49 +61,48 @@ $(document).ready(function()
 
 	var ambiantLight = new THREE.AmbientLight(0xffffff, .5);
 	scene.add(ambiantLight);
-	
+
 	var pointLight = new THREE.PointLight(0xffffff, .5);
 	scene.add(pointLight);
 	pointLight.position.direction = true;
-	
-	function movePointLight(){
-		if( pointLight.position.direction )
-			pointLight.position.y+=.05;
-			else
-			pointLight.position.y-=.05;
 
-			if( pointLight.position.y < -1){
+	function movePointLight() {
+		if (pointLight.position.direction)
+			pointLight.position.y += .05;
+		else
+			pointLight.position.y -= .05;
+
+		if (pointLight.position.y < -1) {
 			pointLight.position.direction = true;
 		}
-		if( pointLight.position.y > 1){
+		if (pointLight.position.y > 1) {
 			pointLight.position.direction = false;
 		}
 	}
 
 	var pointLight2 = new THREE.PointLight(0xffffff, .5);
-	pointLight2.position.set(0,-2,0);
+	pointLight2.position.set(0, -2, 0);
 	scene.add(pointLight2);
 
-	
+
 	//-- axes
 
-	var axesHelper = new THREE.AxesHelper( 5 );
-	scene.add( axesHelper );
+	var axesHelper = new THREE.AxesHelper(5);
+	scene.add(axesHelper);
 
 
 	//-- figure
 
 	figure = new Figure();
-	scene.add( figure.object );
+	scene.add(figure.object);
 
 
 	//-- animate
 
-	function animate()
-	{
-		requestAnimationFrame( animate );
+	function animate() {
+		requestAnimationFrame(animate);
 		controls.update();
-		renderer.render( scene, camera );
+		renderer.render(scene, camera);
 
 		//movePointLight();
 	}
@@ -116,52 +111,51 @@ $(document).ready(function()
 
 
 	//-- interface update by Socket.io
-	
+
 	var socket = io();
 	socket.on('data', data_load);
 
 
 
-	function data_load(d){
+	function data_load(d) {
 		var [distance, x, y] = d.split("\t");
-		y = Math.ceil(y*1.05*100)/100 + "";	// => improper scanner calibration correction
+		y = Math.ceil(y * 1.05 * 100) / 100 + "";	// => improper scanner calibration correction
 		//console.log(distance + ' - ' + x + ' - ' + y);
-		figure.add(distance, x, y);
-		//add_point_spherical(distance, x, y);
+
+		switch( $('input[name=model]:checked').val() ){
+			case "point":
+				figure.add_point(distance, x, y);
+				break;
+			case "plain":
+				figure.wireframe = false;
+				figure.add(distance, x, y);
+				break;
+			default:
+				figure.wireframe = true;
+				figure.add(distance, x, y);
+		}
 	}
 
 
 	//-- object loading by clicking
 
-	$('body').delegate('li', 'click', function(){
+	$('body').delegate('li', 'click', function () {
 		var filename = $(this).attr('file');
 
 		console.log('Generating ' + filename);
 
 		figure.clear();
-	
-		$.ajax('/file/'+filename).done(function(data){
+
+		$.ajax('/file/' + filename).done(function (data) {
 			var d = data.split("\n");
 
-			for(var i=0 ; i<d.length ; i++){
+			for (var i = 0; i < d.length; i++) {
 				//console.log(d[i]);
 				data_load(d[i]);
 			}
 		});
 	});
 
-	function add_point_spherical(distance, x, y)
-	{
-		var geometry = new THREE.SphereGeometry(.003);
-		var material = new THREE.MeshBasicMaterial({color:0xffff00});
-		var sphere = new THREE.Mesh(geometry, material);
-		sphere.position.set(0,0,50);
-		sphere.position.setFromSphericalCoords(distance/100, THREE.Math.degToRad(y), THREE.Math.degToRad(x) );
-		scene.add(sphere);
-	}
-
-
-	
 
 });
 
