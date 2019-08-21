@@ -173,6 +173,9 @@ $(document).ready(function () {
 				data_load(d[i]);
 			}
 		});
+
+		$('#files li').css('background-color', '');
+		$(this).parent().css('background-color', 'grey');
 	});
 
 	$('#panel').delegate('.delete', 'click', function () {

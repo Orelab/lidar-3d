@@ -37,7 +37,9 @@ class Figure {
         this.object = new THREE.Mesh( this.geom, this.mat );
         //this.object.geometry.attributes.position.needsUpdate = true;
 
-        window.addEventListener('click', function(){ this.click(); }.bind(this), false);
+        document
+            .getElementById('debug')
+            .addEventListener('click', function(){ this.click(); }.bind(this), false);
     }
 
 
