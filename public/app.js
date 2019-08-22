@@ -155,9 +155,9 @@ $(document).ready(function () {
 	}
 
 
-	//-- object loading by clicking
+	//-- Load object
 
-	$('#panel').delegate('.plain,.wireframe,.point', 'click', function () {
+	$('#files').delegate('.plain,.wireframe,.point', 'click', function () {
 		mode = this.className;
 		const filename = $(this).parent().attr('file');
 
@@ -178,7 +178,11 @@ $(document).ready(function () {
 		$(this).parent().css('background-color', 'grey');
 	});
 
-	$('#panel').delegate('.delete', 'click', function () {
+
+
+	//-- Delete object
+
+	$('#files').delegate('.delete', 'click', function () {
 
 		if( ! confirm('Are you sure you want to delete this file ? ' + "\n"
 			+ '(it will just  be moved in the trash/ folder)') ){
@@ -186,7 +190,7 @@ $(document).ready(function () {
 			return;
 		}
 
-		const filename = $(this).parent().attr('file');
+		let filename = $(this).parent().attr('file');
 
 		console.log('Deleting ' + filename);
 
@@ -201,6 +205,33 @@ $(document).ready(function () {
 	});
 
 
+
+	//-- Rename file
+
+	$('#files').delegate('li', 'dblclick', function () {
+
+		let newname = prompt('New name (nothing will cancel) ?');
+		let oldname = $(this).attr('file');
+
+		console.log('Renaming ' + oldname + ' to ' + newname);
+
+		$.ajax('/rename/' + oldname + '/' + newname).done(function (data) {
+			if (data == 'ok') {
+				generate_interface();
+				alert('File Renamed !');
+			} else {
+				alert('The file couldn\'t be renamed');
+			}
+		});
+	});
+
+
+
+	//-- Change mesh style
+
+	$('input[type=radio][name=triangle]').on('change', function() {
+		figure.mesh_style = $(this).val();
+	});
 });
 
 

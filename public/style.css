@@ -33,11 +33,15 @@ html canvas {
 	cursor: pointer;
 }
 
-#panel input {
+#panel h1 {
+	text-align: center;
+}
+
+#files input {
 	margin: 15px 15px 15px 0;
 }
 
-#panel button {
+#files button {
 	display: inline-block;
 	min-width: 18px;
 	min-height: 18px;
@@ -62,21 +66,26 @@ button.delete {
 	background-image: url(delete.png);
 }
 
-#panel button:hover {
+#files button:hover {
 	background-color: grey;
 }
 
-#panel button:last-of-type:hover {
+#files button:last-of-type:hover {
 	font-weight: bold;
 	background-color: grey;
 }
 
-#panel li:hover {
+#files li:hover {
 	background-color: grey;
 }
 
-#panel span {
+#files span {
 	color: #666;
 	font-style: italic;
 	font-size: .8em;
+}
+
+#panel hr {
+	border-top: 1px black solid;
+	margin: 15px 0;
 }

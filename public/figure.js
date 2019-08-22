@@ -9,9 +9,12 @@ class Figure {
 
     geom = null;
     mat = null;
+    object = null;
+
     wireframe = true;
     raise = 1;
-    object = null;
+    excessive_distance = .3;
+    mesh_style = 0;
 
     constructor()
     {
@@ -120,13 +123,47 @@ class Figure {
             this.points[y].prev_val(x),
             ( this.points.prev_val(y) || {} )[x]
         ];
+
+        var variante = this.mesh_style==0
+            ? ( this.points.prev_val(y) || new List() ).next_val(x)
+            : ( this.points.prev_val(y) || new List() ).prev_val(x);
+
         var face2 = [
             this.points[y][x],
-            this.points[y].prev_val(x),
-            ( this.points.prev_val(y) || new List() ).next_val(x)
+            ( this.points.prev_val(y) || {} )[x],
+            variante
         ];
         
-        return [face1, face2];
+        return [
+            this.filter_excessive_distance(face1, this.excessive_distance),
+            this.filter_excessive_distance(face2, this.excessive_distance)
+        ];
+    }
+
+
+    /*
+        Returns null if the distance between points is excessive,
+        returns the face if its seems to be ok...
+    */
+    filter_excessive_distance(face, max_distance){
+
+        function distance(v1, v2){
+            var dx = v1.x - v2.x;
+            var dy = v1.y - v2.y;
+            var dz = v1.z - v2.z;
+            return Math.sqrt( dx * dx + dy * dy + dz * dz );
+        }
+
+        if( face[0]==null || face[1]==null || face[2]==null ){
+            return face;
+        }
+
+        if( distance( face[0].coords, face[1].coords ) > max_distance
+        ||  distance( face[1].coords, face[2].coords ) > max_distance
+        ||  distance( face[2].coords, face[0].coords ) > max_distance )
+            return null;
+            else
+            return face;
     }
 
 
