@@ -138,6 +138,7 @@ $(document).ready(function () {
 
 
 	function data_load(d) {
+		console.log(d);
 		var [distance, x, y] = d.split("\t");
 		y = Math.ceil(y * vertical_correction * 100) / 100 + "";	// => improper scanner calibration correction
 		//console.log(distance + ' - ' + x + ' - ' + y);
@@ -242,7 +243,6 @@ $(document).ready(function () {
 	$('input[name=vertical]').on('input', function() {
 		vertical_correction = $(this).val();
 		$('#vertical_value').html(vertical_correction);
-		console.log(vertical_correction);
 	});
 });
 

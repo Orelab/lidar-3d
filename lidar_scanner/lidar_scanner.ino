@@ -35,7 +35,8 @@ void setup()
 
   sensor.init();
   sensor.setTimeout(500);
-  sensor.startContinuous();
+  //sensor.startContinuous();
+  sensor.setMeasurementTimingBudget(200000);
 
   x_servo.attach(4);
   y_servo.attach(5);
@@ -76,7 +77,8 @@ void play(int x, int y)
   
   delay(del);
 
-  float distance = sensor.readRangeContinuousMillimeters();
+  //float distance = sensor.readRangeContinuousMillimeters();
+  float distance = sensor.readRangeSingleMillimeters();
 
   if( distance>60000 )
   {

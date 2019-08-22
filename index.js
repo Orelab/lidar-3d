@@ -1,5 +1,23 @@
-const USB_PORT = '/dev/ttyUSB0';
+var USB_PORT = '/dev/ttyUSB0';
 
+
+
+/*
+  USB Lidar communication
+
+  When data is received, it is transfered :
+  - at the Webserver, throw socket
+  - saved in a file, with NodeFS
+
+*/
+const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline');
+var port = new SerialPort(USB_PORT);
+const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+
+
+
+// Webserver interface
 
 const express = require('express');
 const app = express();
@@ -8,10 +26,8 @@ const serv = require('http');
 const http = serv.Server(app);
 var io = require('socket.io')(http);
 
-var SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
-var port = new SerialPort(USB_PORT);
-const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+
+// Filesystem file storage
 
 const path = require('path');
 const fs = require('fs');
@@ -70,9 +86,9 @@ http.listen(3000, function(){
 });
 
 
+
 parser.on('data', function(data){
   io.emit('data', data);
-
+  console.log(data);
   fs.appendFile("log/"+filename+".txt", data+"\n", function(err){}); 
 });
-
