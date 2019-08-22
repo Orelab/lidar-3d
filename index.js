@@ -41,19 +41,26 @@ app.get('/files', function(req, res){
 });
 
 app.get('/file/:filename', function(req, res){
-  fs.readFile('log/'+req.params.filename, 'utf8', function(err,data){
+  const filename = decodeURIComponent(req.params.filename);
+
+  fs.readFile('log/'+filename, 'utf8', function(err,data){
     res.send(data);
   });
 });
 
 app.get('/delete/:filename', function(req, res){
-  fs.rename('log/'+req.params.filename, 'trash/'+req.params.filename, function(err){
+  const filename = decodeURIComponent(req.params.filename);
+
+  fs.rename('log/'+filename, 'trash/'+filename, function(err){
     res.send(err ? 'ko' : 'ok');
   });
 });
 
 app.get('/rename/:oldname/:newname', function(req, res){
-  fs.rename('log/'+req.params.oldname, 'log/'+req.params.newname, function(err){
+  const oldname = decodeURIComponent(req.params.oldname);
+  const newname = decodeURIComponent(req.params.newname);
+    
+  fs.rename('log/'+oldname, 'log/'+newname, function(err){
     res.send(err ? 'ko' : 'ok');
   });
 });

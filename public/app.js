@@ -45,7 +45,9 @@ function generate_interface() {
 }
 
 
-var scene, figure, mode;	// mode = plain/wireframe/point
+var scene, figure;
+var mode;					// mode = plain/wireframe/point
+var vertical_correction = 1.1;	// vertical correction could be necessary where lidar is badly calibrated
 
 $(document).ready(function () {
 	generate_interface();
@@ -137,7 +139,7 @@ $(document).ready(function () {
 
 	function data_load(d) {
 		var [distance, x, y] = d.split("\t");
-		y = Math.ceil(y * 1.05 * 100) / 100 + "";	// => improper scanner calibration correction
+		y = Math.ceil(y * vertical_correction * 100) / 100 + "";	// => improper scanner calibration correction
 		//console.log(distance + ' - ' + x + ' - ' + y);
 
 		switch (mode) {
@@ -165,7 +167,7 @@ $(document).ready(function () {
 
 		figure.clear();
 
-		$.ajax('/file/' + filename).done(function (data) {
+		$.ajax('/file/' + encodeURIComponent(filename) ).done(function (data) {
 			var d = data.split("\n");
 
 			for (var i = 0; i < d.length; i++) {
@@ -194,7 +196,7 @@ $(document).ready(function () {
 
 		console.log('Deleting ' + filename);
 
-		$.ajax('/delete/' + filename).done(function (data) {
+		$.ajax('/delete/' + encodeURIComponent(filename) ).done(function (data) {
 			if (data == 'ok') {
 				generate_interface();
 				alert('File deleted !');
@@ -210,12 +212,12 @@ $(document).ready(function () {
 
 	$('#files').delegate('li', 'dblclick', function () {
 
-		let newname = prompt('New name (nothing will cancel) ?');
 		let oldname = $(this).attr('file');
+		let newname = prompt('New name (nothing will cancel) ?', oldname);
 
 		console.log('Renaming ' + oldname + ' to ' + newname);
 
-		$.ajax('/rename/' + oldname + '/' + newname).done(function (data) {
+		$.ajax('/rename/' + encodeURIComponent(oldname) + '/' + encodeURIComponent(newname) ).done(function (data) {
 			if (data == 'ok') {
 				generate_interface();
 				alert('File Renamed !');
@@ -227,10 +229,20 @@ $(document).ready(function () {
 
 
 
-	//-- Change mesh style
+	//-- Change elevation
 
-	$('input[type=radio][name=triangle]').on('change', function() {
-		figure.mesh_style = $(this).val();
+	$('input[name=elevation]').on('input', function() {
+		figure.raise = $(this).val();
+		$('#elevation_value').html(figure.raise);
+	});
+
+
+	//-- Change vertical correction
+
+	$('input[name=vertical]').on('input', function() {
+		vertical_correction = $(this).val();
+		$('#vertical_value').html(vertical_correction);
+		console.log(vertical_correction);
 	});
 });
 
