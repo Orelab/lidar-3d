@@ -12,7 +12,9 @@ var USB_PORT = '/dev/ttyUSB0';
 */
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-var port = new SerialPort(USB_PORT);
+var port = new SerialPort(USB_PORT, {
+  baudRate: 115200
+});
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
 
@@ -42,8 +44,10 @@ app.get('/files', function(req, res){
 
   fs.readdir(directoryPath, function(err, files){
       if(err){
-          res.send('error');
+        res.send(content);
+        return;
       }
+
       for(var i=0 ; i<files.length ; i++){
         content.push({
           file: files[i],
@@ -90,5 +94,5 @@ http.listen(3000, function(){
 parser.on('data', function(data){
   io.emit('data', data);
   console.log(data);
-  fs.appendFile("log/"+filename+".txt", data+"\n", function(err){}); 
+  fs.appendFile(__dirname+"/log/"+filename+".txt", data+"\n", function(err){}); 
 });
